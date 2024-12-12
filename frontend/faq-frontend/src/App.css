@@ -1,0 +1,166 @@
+/* Base Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f7fc;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  color: #333;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Typography */
+h1 {
+  font-size: 28px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+h3 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+}
+
+/* Buttons */
+button {
+  display: inline-block;
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  color: #fff;
+  background-color: #3498db;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Input Fields */
+input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #fff;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  resize: vertical;
+}
+
+/* File Dropzone */
+.file-dropzone {
+  border: 2px dashed #ccc;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.file-dropzone p {
+  font-size: 16px;
+  color: #666;
+}
+
+.file-dropzone:hover {
+  background-color: #f8f9fa;
+  border-color: #3498db;
+}
+
+/* Response Section */
+.response-container {
+  background-color: #ecf0f1;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.response-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.response-body {
+  font-size: 16px;
+  color: #34495e;
+}
+
+.response-line {
+  margin: 5px 0;
+}
+
+/* Spacing Utility */
+.mt-4 {
+  margin-top: 20px;
+}
+
+.mt-2 {
+  margin-top: 10px;
+}
+
+.mt-5 {
+  margin-top: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+
+  button {
+    font-size: 14px;
+  }
+
+  .file-dropzone {
+    padding: 20px;
+  }
+}
