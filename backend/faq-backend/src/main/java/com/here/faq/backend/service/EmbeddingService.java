@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -194,7 +195,8 @@ public class EmbeddingService {
     }
 
 
-    public String askQuestionStream(String question) {
+
+    public Flux<String> askQuestionStream(String question) {
         float[] questionEmbedding = getEmbedding(question);
         String embeddingString = convertEmbeddingToString(questionEmbedding);
         List<String> context;
@@ -205,42 +207,33 @@ public class EmbeddingService {
         }
 
         if (context.isEmpty()) {
-            return "No relevant context found for the question.";
+            return Flux.just("No relevant context found for the question.");
         }
+
         String combinedContext = String.join("\n", context);
         String prompt = "Context:\n" + combinedContext + "\n\nQuestion:\n" + question;
 
-        StringBuilder completeResponse = new StringBuilder();
-        try {
-            // Start streaming the response from the LLM API
-            webClient.post()
-                    .uri(ollamaApiGenerateUrl)
-                    .bodyValue(new LlmRequest(prompt, model))
-                    .retrieve()
-                    .bodyToFlux(String.class)  // This will stream the response as a Flux of Strings
-                    .doOnTerminate(() -> {
-                        // Handle completion logic here
-                        System.out.println("Streaming finished.");
-                    })
-                    .subscribe(responsePart -> {
-                        try {
-                            JsonObject responseObject = JsonParser.parseString(responsePart).getAsJsonObject();
-                            String responseText = responseObject.get("response").getAsString();
-                            completeResponse.append(responseText);
+        return webClient.post()
+                .uri(ollamaApiGenerateUrl)
+                .bodyValue(new LlmRequest(prompt, model))
+                .retrieve()
+                .bodyToFlux(String.class)
+                .map(responsePart -> {
+                    try {
+                        JsonObject responseObject = JsonParser.parseString(responsePart).getAsJsonObject();
+                        String responseText = responseObject.get("response").getAsString();
 
-                            // Check for completion signal and stop if done
-                            if (responseObject.has("done") && responseObject.get("done").getAsBoolean()) {
-                                System.out.println("Received all parts of the response.");
-                            }
-                        } catch (Exception e) {
-                            System.err.println("Error processing response part: " + e.getMessage());
+                        // Check for completion signal
+                        if (responseObject.has("done") && responseObject.get("done").getAsBoolean()) {
+                            System.out.println("Received all parts of the response.");
                         }
-                    });
 
-            return completeResponse.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate response from LLM", e);
-        }
+                        return responseText;
+                    } catch (Exception e) {
+                        System.err.println("Error processing response part: " + e.getMessage());
+                        return "";
+                    }
+                });
     }
 
 
