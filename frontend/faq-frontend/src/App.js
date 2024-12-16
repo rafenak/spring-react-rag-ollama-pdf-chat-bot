@@ -20,7 +20,7 @@ function App() {
     }
     setFile(uploadedFile);
   };
-  
+
   const handleQuestionChange = (e) => {
     setQuestion(e.target.value);
   };
@@ -52,7 +52,7 @@ function App() {
     }
   };
 
-  //Asking the questions
+  //Asking the questions normal
   const handleAskQuestion = async () => {
     if (!question) {
       alert('Please enter a question');
@@ -74,9 +74,51 @@ function App() {
   };
 
 
+  //Asking the questions in stream
+  const handleAskQuestionStream = async () => {
+    if (!question) {
+      alert("Please enter a question");
+      return;
+    }
+
+    setIsLoading(true);
+    setResponse(""); // Clear previous response
+
+    try {
+      const url = `${BASE_URL}/ask/stream`;
+
+      const eventSource = new EventSource(`${url}?question=${encodeURIComponent(question)}`);
+
+      // Listen for incoming data
+      eventSource.onmessage = (event) => {
+        setResponse((prev) => prev + event.data);
+      };
+
+      eventSource.onerror = (error) => {
+        console.log("Error in stream:", error);
+        eventSource.close();
+        setIsLoading(false);
+        alert("Error receiving streamed response");
+      };
+
+      eventSource.onclose = () => {
+        setIsLoading(false);
+      };
+
+    } catch (error) {
+      console.log("Error asking question:", error);
+      alert("Error asking question");
+      setIsLoading(false);
+    }
+  };
+
+
+
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: '.pdf',
+    accept: {
+      'application/pdf': ['.pdf'],
+    },
     multiple: false,
   });
 
