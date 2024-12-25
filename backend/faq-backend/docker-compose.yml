@@ -3,17 +3,22 @@ version: '3.8'
 services:
   db:
     hostname: db
-    image: ankane/pgvector  # This image already includes pgvector
+    image: ankane/pgvector  # Includes pgvector
     ports:
-      - "5555:5432"  # Map PostgreSQL port to 5555 on host
+      - "5555:5432"  # Only for development
     restart: always
     environment:
-      POSTGRES_DB: llm  # Set the database name to 'llm'
+      POSTGRES_DB: llm
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust  # This allows any connection to be trusted (not recommended for production)
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Map init.sql file here
+      - postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "llm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   springboot-app:
     build: .
@@ -22,9 +27,10 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
     ports:
-      - "8080:8080"
+      - "8888:8888"
     depends_on:
       - db
+    # Add retries for database connection in your Spring Boot configuration
 
 volumes:
   postgres-data:
