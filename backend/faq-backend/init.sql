@@ -1,16 +1,44 @@
--- Create the 'llm' database (only if it doesn't already exist)
--- This command will be executed only if the database is not already created by PostgreSQL
+-- Ensure the 'llm' database exists and create it if not
 DO
 $$
 BEGIN
+    -- Check if the 'llm' database exists
     IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'llm') THEN
-        PERFORM dblink_exec('dbname=postgres', 'CREATE DATABASE llm');
+        -- Create the 'llm' database if it doesn't exist
+        PERFORM pg_catalog.pg_create_database('llm');
     END IF;
 END
 $$;
 
--- Connect to the 'llm' database
+-- Ensure the 'llm' database exists and create it if not
+DO
+$$
+BEGIN
+    -- Check if the 'llm' database exists
+    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'llm') THEN
+        -- Create the 'llm' database if it doesn't exist
+        PERFORM pg_catalog.pg_create_database('llm');
+    END IF;
+END
+$$;
+
+-- Wait until the 'llm' database is available
+-- Using pg_sleep to ensure the database creation has been completed
+SELECT pg_sleep(2);
+
+-- Connect to the 'llm' database and install the pgvector extension
 \c llm;
 
--- Enable the pgvector extension in the 'llm' database
-CREATE EXTENSION IF NOT EXISTS pgvector;
+-- Install pgvector extension if it's not already installed
+DO
+$$
+BEGIN
+    -- Check if pgvector extension is already installed
+    IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pgvector') THEN
+        -- Install pgvector extension if it doesn't exist
+        CREATE EXTENSION pgvector;
+    END IF;
+END
+$$;
+
+
